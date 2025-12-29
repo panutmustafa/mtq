@@ -85,7 +85,7 @@ $announcements = $stmt->fetchAll();
         </style>
     </head>
     <body>
-        <?php include __DIR__ . '/../includes/admin_header.php'; // Gunakan header yang sama dengan dashboard_admin ?>    <div class="container mt-4">
+        <?php include __DIR__ . '/../includes/admin_navbar.php'; // Gunakan header yang sama dengan dashboard_admin ?>    <div class="container mt-4">
         <div class="card shadow-sm">
             <div class="card-header bg-dark text-white">
                 <i class="fas fa-bullhorn me-2"></i> Kelola Pengumuman
