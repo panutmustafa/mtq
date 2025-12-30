@@ -1,12 +1,6 @@
 <?php
-session_start();
-require_once __DIR__.'/../includes/auth.php';
-if ($_SESSION['role'] !== 'admin') {
-    header('Location: ../login.php');
-    exit();
-}
-
-require_once __DIR__.'/../config/database.php';
+$page_title = 'Manage Users';
+require_once __DIR__.'/../includes/admin_header.php';
 
 // PROSES UTAMA
 $message = '';
@@ -86,37 +80,11 @@ $stmt->bindValue(':limit', $records_per_page, PDO::PARAM_INT);
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
 $users = $stmt->fetchAll();
-
-$full_name = htmlspecialchars($_SESSION['full_name'] ?? $_SESSION['username'] ?? 'Admin'); // Ensure $full_name is defined for admin_navbar.php
 ?>
-
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Users</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
-        .role-badge {
-            font-size: 0.8rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 1rem;
-        }
-        .role-admin { background-color: #dc3545; color: white; }
-        .role-guru { background-color: #0d6efd; color: white; }
-        .role-siswa { background-color: #198754; color: white; }
-    </style>
-</head>
-<body>
-    <?php include __DIR__.'/../includes/admin_navbar.php'; ?>
-    
-    <div class="container py-4">
+<?php include __DIR__ . '/../includes/admin_sidebar.php'; ?>
+<div class="content-wrapper">
+    <?php include __DIR__ . '/../includes/admin_content_header.php'; ?>
+    <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2><i class="bi bi-people-fill"></i> Manage Users</h2>
             <a href="dashboard_admin.php" class="btn btn-secondary">
@@ -297,47 +265,21 @@ $full_name = htmlspecialchars($_SESSION['full_name'] ?? $_SESSION['username'] ??
         </div>
     </div>
 
-    </div> <!-- Close container -->
-    <footer class="mt-5 py-3 bg-light">
-        <div class="container">
-          <p class="text-center mb-0">Developed by <b>Panut, S.Pd.</b> | SD Negeri Jomblang 2 &copy; 2025</p>
-        </div>
-    </footer>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Inisialisasi modal edit
-        var editModal = document.getElementById('editModal');
-        editModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var id = button.getAttribute('data-id');
-            var username = button.getAttribute('data-username');
-            var full_name = button.getAttribute('data-full_name');
-            var role = button.getAttribute('data-role');
+<?php include __DIR__.'/../includes/admin_footer.php'; ?>
+<script>
+    // Inisialisasi modal edit
+    var editModal = document.getElementById('editModal');
+    editModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var id = button.getAttribute('data-id');
+        var username = button.getAttribute('data-username');
+        var full_name = button.getAttribute('data-full_name');
+        var role = button.getAttribute('data-role');
 
-            // Isi data ke modal
-            document.getElementById('editUser Id').value = id;
-            document.getElementById('editUsername').value = username;
-            document.getElementById('editFullName').value = full_name;
-            document.getElementById('editRole').value = role;
-        });
-    </script>
-    <!-- Logout Confirmation Modal -->
-    <div class="modal fade" id="logoutConfirmModal" tabindex="-1" aria-labelledby="logoutConfirmModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="logoutConfirmModalLabel">Konfirmasi Logout</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            Apakah Anda yakin ingin keluar dari sesi Anda?
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-            <a href="/mtq/logout.php" class="btn btn-danger">Logout</a>
-          </div>
-        </div>
-      </div>
-    </div>
-</body>
-</html>
+        // Isi data ke modal
+        document.getElementById('editUser Id').value = id;
+        document.getElementById('editUsername').value = username;
+        document.getElementById('editFullName').value = full_name;
+        document.getElementById('editRole').value = role;
+    });
+</script>

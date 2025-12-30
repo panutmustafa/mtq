@@ -1,14 +1,6 @@
 <?php
-session_start();
-require_once __DIR__.'/../includes/auth.php'; // Pastikan path benar
-
-// Hanya admin yang bisa mengakses halaman ini
-if ($_SESSION['role'] !== 'admin') {
-    header('Location: ../login.php');
-    exit();
-}
-
-require_once __DIR__.'/../config/database.php'; // Koneksi database
+$page_title = 'Kelola Peserta';
+require_once __DIR__.'/../includes/admin_header.php';
 
 // Inisialisasi variabel untuk pesan feedback
 $success_message = '';
@@ -129,66 +121,11 @@ $stmt->bindValue(':limit', $records_per_page, PDO::PARAM_INT);
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
 $participants = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-$full_name = htmlspecialchars($_SESSION['full_name'] ?? $_SESSION['username'] ?? 'Admin'); // Ensure $full_name is defined for admin_navbar.php
 ?>
-
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola Peserta - Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f8f9fa;
-        }
-        .container {
-            max-width: 1200px;
-            margin-top: 30px;
-            margin-bottom: 50px;
-        }
-        .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-        .card-header {
-            background-color: #007bff;
-            color: white;
-            border-radius: 10px 10px 0 0;
-            padding: 15px 20px;
-            font-size: 1.25rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .table-responsive {
-            margin-top: 20px;
-        }
-        .btn-action {
-            margin-right: 5px;
-        }
-        /* Style untuk modal */
-        .modal-header {
-            background-color: #007bff;
-            color: white;
-        }
-        .modal-footer .btn-danger {
-            background-color: #dc3545;
-            border-color: #dc3545;
-        }
-    </style>
-</head>
-<body>
-    <?php include __DIR__.'/../includes/admin_navbar.php'; ?>
-
-    <div class="container">
+<?php include __DIR__ . '/../includes/admin_sidebar.php'; ?>
+<div class="content-wrapper">
+    <?php include __DIR__ . '/../includes/admin_content_header.php'; ?>
+    <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2><i class="bi bi-people-fill"></i> Kelola Data Peserta</h2>
             <div>
@@ -412,13 +349,7 @@ $full_name = htmlspecialchars($_SESSION['full_name'] ?? $_SESSION['username'] ??
         </div>
     </div>
 
-    </div> <!-- Close container -->
-    <footer class="mt-5 py-3 bg-light">
-        <div class="container">
-          <p class="text-center mb-0">Developed by <b>Panut, S.Pd.</b> | SD Negeri Jomblang 2 &copy; 2025</p>
-        </div>
-    </footer>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<?php include __DIR__.'/../includes/admin_footer.php'; ?>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.min.js"></script>
@@ -427,7 +358,7 @@ $full_name = htmlspecialchars($_SESSION['full_name'] ?? $_SESSION['username'] ??
             // Inisialisasi DataTable
             $('#participantsTable').DataTable({
                 "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Indonesian.json" // Bahasa Indonesia
+                    "url": "https://cdn.datatables.net/plug-ins/1.10.25/i18n/Indonesian.json" // Bahasa Indonesia
                 }
             });
 
@@ -490,23 +421,4 @@ $full_name = htmlspecialchars($_SESSION['full_name'] ?? $_SESSION['username'] ??
             });
         });
     </script>
-    <!-- Logout Confirmation Modal -->
-    <div class="modal fade" id="logoutConfirmModal" tabindex="-1" aria-labelledby="logoutConfirmModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="logoutConfirmModalLabel">Konfirmasi Logout</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            Apakah Anda yakin ingin keluar dari sesi Anda?
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-            <a href="/mtq/logout.php" class="btn btn-danger">Logout</a>
-          </div>
-        </div>
-      </div>
-    </div>
-</body>
-</html>
+

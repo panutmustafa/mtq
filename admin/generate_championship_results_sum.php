@@ -11,13 +11,13 @@ require_once __DIR__ . '/../config/database.php';
 // Atur zona waktu ke WIB
 date_default_timezone_set('Asia/Jakarta');
 
-// Proses generate jika form submitted (misalnya, dari tombol "Generate Hasil" di reports.php)
+// Proses generate jika form submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate_results'])) {
     try {
         // Hapus hasil championship lama untuk menghindari duplikasi
         $pdo->exec("DELETE FROM championships");
 
-        // Query untuk hitung rata-rata skor per peserta per kompetisi
+        // Query untuk hitung jumlah skor per peserta per kompetisi
         $query = "
             SELECT 
                 s.competition_id,
@@ -25,12 +25,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate_results'])) 
                 s.participant_id,
                 p.full_name AS participant_name,
                 p.school AS school,
-                AVG(s.score) AS average_score
+                SUM(s.score) AS total_score
             FROM scores s
             JOIN competitions c ON s.competition_id = c.id
             JOIN participants p ON s.participant_id = p.id
             GROUP BY s.competition_id, s.participant_id
-            ORDER BY s.competition_id, average_score DESC
+            ORDER BY s.competition_id, total_score DESC
         ";
 
         $stmt = $pdo->prepare($query);
@@ -47,13 +47,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate_results'])) 
                 // Reset peringkat untuk kompetisi baru
                 $current_competition = $result['competition_id'];
                 $position = 1;
-                $previous_score = $result['average_score'];
+                $previous_score = $result['total_score'];
             } else {
                 // Jika skor sama dengan sebelumnya, gunakan peringkat sama; jika lebih rendah, naikkan peringkat
-                if ($result['average_score'] < $previous_score) {
+                if ($result['total_score'] < $previous_score) {
                     $position++;
                 }
-                $previous_score = $result['average_score'];
+                $previous_score = $result['total_score'];
             }
 
             // Insert ke championships
@@ -68,13 +68,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate_results'])) 
                 $result['participant_id'],
                 $result['participant_name'],
                 $position,
-                $result['average_score'],
+                $result['total_score'],
                 $result['school']
             ]);
         }
 
         // Redirect dengan pesan sukses
-        header('Location: manage_championship_results.php?feedback_type=success&feedback_message=' . urlencode('Hasil kejuaraan berhasil digenerate'));
+        header('Location: manage_championship_results.php?feedback_type=success&feedback_message=' . urlencode('Hasil kejuaraan berdasarkan jumlah skor berhasil digenerate'));
         exit();
 
     } catch (PDOException $e) {
@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate_results'])) 
         exit();
     }
 } else {
-    // Jika diakses langsung tanpa POST, redirect ke reports
+    // Jika diakses langsung tanpa POST, redirect ke manage_championship_results
     header('Location: manage_championship_results.php');
     exit();
 }

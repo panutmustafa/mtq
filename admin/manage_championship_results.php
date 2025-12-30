@@ -1,12 +1,6 @@
 <?php
-require_once __DIR__ . '/../includes/auth.php'; // Pastikan file ini menangani session_start()
-require_once __DIR__ . '/../config/database.php'; // Pastikan ini ada dan koneksi PDO sudah dibuat ($pdo)
-
-// Pengecekan role spesifik
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header('Location: ../login.php?error=unauthorized');
-    exit();
-}
+$page_title = 'Manage Championship Results';
+require_once __DIR__ . '/../includes/admin_header.php';
 
 // Inisialisasi pesan feedback
 $feedback_message = '';
@@ -136,211 +130,26 @@ unset($filter_params['page']); // Hapus 'page' agar tidak double
 $filter_params_suffix = !empty($filter_params) ? '&' . http_build_query($filter_params) : '';
 
 ?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola Hasil Kejuaraan | Sistem Penilaian Lomba</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f0f2f5;
-            color: #333;
-        }
-        .navbar {
-            background-color: #2c3e50;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .navbar-brand {
-            font-weight: 700;
-            color: #ecf0f1 !important;
-        }
-        .navbar .nav-link {
-            color: #bdc3c7 !important;
-            transition: color 0.3s ease;
-        }
-        .navbar .nav-link:hover {
-            color: #ecf0f1 !important;
-        }
-        .btn-outline-light {
-            border-color: #ecf0f1;
-            color: #ecf0f1;
-            transition: all 0.3s ease;
-        }
-        .btn-outline-light:hover {
-            background-color: #ecf0f1;
-            color: #2c3e50;
-        }
-
-        .container {
-            padding-top: 30px;
-            padding-bottom: 30px;
-        }
-
-        .card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            margin-bottom: 2rem;
-            overflow: hidden;
-        }
-
-        .card-header {
-            background-color: #3498db;
-            color: white;
-            font-weight: 600;
-            padding: 1.25rem 1.5rem;
-            font-size: 1.15rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .card-header.bg-primary { background-color: #007bff; } /* Specific for input form */
-        .card-header.bg-info { background-color: #17a2b8; } /* Specific for table list */
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        .alert-custom {
-            border-radius: 8px;
-            padding: 1rem 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        /* Bootstrap default alert colors are fine, but ensure icons match */
-        .alert-custom.alert-info i { color: #31708f; }
-        .alert-custom.alert-success i { color: #3c763d; }
-        .alert-custom.alert-danger i { color: #a94442; }
-        .alert-custom.alert-warning i { color: #8a6d3b; }
-
-
-        .table thead th {
-            background-color: #e9ecef;
-            color: #495057;
-            font-weight: 600;
-            vertical-align: middle;
-            border-bottom: 2px solid #dee2e6;
-            text-align: center;
-        }
-        .table tbody tr:hover {
-            background-color: #f5f5f5;
-        }
-        .table td, .table th {
-            vertical-align: middle;
-            padding: 0.75rem;
-        }
-        .table .btn {
-            border-radius: 6px;
-            font-size: 0.85rem;
-            padding: 0.4rem 0.8rem;
-        }
-        .table .btn i {
-            margin-right: 5px;
-        }
-
-        /* Responsive Table */
-        @media (max-width: 767.98px) {
-            .table-responsive {
-                border: 1px solid #dee2e6;
-                border-radius: 0.75rem;
-                overflow-x: auto;
-            }
-            .table thead {
-                display: none;
-            }
-            .table tbody tr {
-                display: block;
-                margin-bottom: 1rem;
-                border: 1px solid #ddd;
-                border-radius: 0.75rem;
-                background-color: #fff;
-                box-shadow: 0 2px 8px rgba(0,0,0,.05);
-                padding: 0.75rem;
-            }
-            .table tbody td {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 0.5rem 0.25rem;
-                border: none;
-                border-bottom: 1px solid #eee;
-            }
-            .table tbody td:last-child {
-                border-bottom: none;
-            }
-            .table tbody td::before {
-                content: attr(data-label);
-                font-weight: bold;
-                margin-right: 0.5rem;
-                color: #555;
-                flex-shrink: 0;
-                text-align: left;
-                width: 40%;
-            }
-            /* Specific labels for Championship table */
-            .table tbody td:nth-child(1)::before { content: "Nama Lomba"; }
-            .table tbody td:nth-child(2)::before { content: "Peserta"; }
-            .table tbody td:nth-child(3)::before { content: "Posisi"; }
-            .table tbody td:nth-child(4)::before { content: "Skor"; }
-            .table tbody td:nth-child(5)::before { content: "Sekolah"; }
-            .table tbody td:nth-child(6)::before { content: "Aksi"; }
-        }
-    </style>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark px-3">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="dashboard_admin.php"><i class="fas fa-cogs me-2"></i> Admin Dashboard</a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
-                    <li class="nav-item">
-                        <a class="nav-link" href="dashboard_admin.php"><i class="fas fa-tachometer-alt me-1"></i> Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="manage_competitions.php"><i class="fas fa-trophy me-1"></i> Lomba</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="manage_users.php"><i class="fas fa-users-cog me-1"></i> Pengguna</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="manage_championship_results.php"><i class="fas fa-medal me-1"></i> Hasil Kejuaraan</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="reports.php"><i class="fas fa-chart-line me-1"></i> Laporan</a>
-                    </li>
-                    <li class="nav-item">
-                        <span class="navbar-text me-lg-3 text-white py-2 py-lg-0">
-                            <i class="fas fa-user-circle me-2"></i> Halo, <?= htmlspecialchars($_SESSION['full_name'] ?? 'Admin') ?>
-                        </span>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="btn btn-outline-light rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#logoutConfirmModal"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    
-    <div class="container mt-4">
+<?php include __DIR__ . '/../includes/admin_sidebar.php'; ?>
+<div class="content-wrapper">
+    <?php include __DIR__ . '/../includes/admin_content_header.php'; ?>
+    <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="mb-0 text-secondary"><i class="fas fa-medal me-3"></i>Kelola Hasil Kejuaraan</h2>
             <div>
                 <a href="dashboard_admin.php" class="btn btn-secondary me-2">
                     <i class="fas fa-arrow-circle-left"></i> Kembali ke Dashboard
                 </a>
+                <form method="POST" action="generate_championship_results.php" class="d-inline-block">
+                    <button type="submit" name="generate_results" class="btn btn-primary me-2">
+                        <i class="fas fa-trophy me-1"></i> Generate Hasil (Rata-rata)
+                    </button>
+                </form>
+                <form method="POST" action="generate_championship_results_sum.php" class="d-inline-block">
+                    <button type="submit" name="generate_results" class="btn btn-success me-2">
+                        <i class="fas fa-plus-square me-1"></i> Generate Hasil (Jumlah Skor)
+                    </button>
+                </form>
                 <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#uploadExcelModal">
                     <i class="fas fa-upload me-1"></i> Upload Hasil Excel
                 </button>
@@ -576,6 +385,4 @@ $filter_params_suffix = !empty($filter_params) ? '&' . http_build_query($filter_
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    </body>
-</html>
+<?php include __DIR__.'/../includes/admin_footer.php'; ?>

@@ -1,16 +1,6 @@
-<?php
-require_once __DIR__ . '/../includes/auth.php'; // Pastikan file ini menangani session_start()
-require_once __DIR__ . '/../config/database.php'; // Opsional, hanya jika dashboard memerlukan data DB langsung
-
-// Pengecekan role spesifik
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    // Redirect langsung ke login dengan pesan error jika tidak otorisasi
-    header('Location: ../login.php?error=unauthorized');
-    exit();
-}
-
-// Ambil data user dari session
-$full_name = htmlspecialchars($_SESSION['full_name'] ?? $_SESSION['username'] ?? 'Admin');
+<?php 
+$page_title = 'Dashboard Admin';
+require_once __DIR__ . '/../includes/admin_header.php'; 
 
 // Fetch statistics
 try {
@@ -42,112 +32,10 @@ try {
     $totalCompetitions = $activeCompetitions = $totalParticipants = $totalScores = $totalChampionshipResults = 0;
 }
 ?>
-<!DOCTYPE html>
-<html lang="id">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Dashboard Admin | Sistem Penilaian Lomba</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-        <style>
-            body {
-                font-family: 'Poppins', sans-serif;
-                background-color: #f0f2f5; /* Light grey background */
-                color: #333;
-            }        .navbar {
-            background-color: #2c3e50; /* Dark blue/grey for navbar */
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        .navbar-brand {
-            font-weight: 700;
-            color: #ecf0f1 !important; /* Light text for brand */
-        }
-        .navbar .nav-link {
-            color: #bdc3c7 !important; /* Lighter text for links */
-            transition: color 0.3s ease;
-        }
-        .navbar .nav-link:hover {
-            color: #ecf0f1 !important; /* White on hover */
-        }
-        .btn-outline-light {
-            border-color: #ecf0f1;
-            color: #ecf0f1;
-            transition: all 0.3s ease;
-        }
-        .btn-outline-light:hover {
-            background-color: #ecf0f1;
-            color: #2c3e50;
-        }
-
-        .container {
-            padding-top: 30px;
-            padding-bottom: 30px;
-        }
-
-        .card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            margin-bottom: 2rem;
-            overflow: hidden; /* For rounded corners on card-header */
-        }
-
-        .card-header {
-            background-color: #3498db; /* Blue for card headers */
-            color: white;
-            font-weight: 600;
-            padding: 1.25rem 1.5rem;
-            font-size: 1.15rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .card-header.bg-dark { background-color: #34495e; } /* Dark Grey */
-
-        .card-body {
-            padding: 1.5rem;
-        }
-        
-        .list-group-item {
-            border: 1px solid rgba(0,0,0,.08);
-            margin-bottom: 5px;
-            border-radius: 8px !important;
-            transition: all 0.2s ease-in-out;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .list-group-item:hover {
-            background-color: #f8f9fa;
-            transform: translateY(-2px);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .list-group-item span {
-            flex-grow: 1; /* Allows text to take available space */
-        }
-        .list-group-item a {
-            text-decoration: none;
-            color: #007bff;
-            font-weight: 500;
-        }
-        /* Specific link colors for menu items */
-        .list-group-item.link-primary { color: #0d6efd; }
-        .list-group-item.link-success { color: #198754; }
-        .list-group-item.link-warning { color: #ffc107; }
-        .list-group-item.link-info { color: #0dcaf0; }
-        .list-group-item.link-danger { color: #dc3545; }
-        .list-group-item.link-dark { color: #212529; } /* For Championship Results */
-
-    </style>
-</head>
-<body>
-    <?php include __DIR__ . '/../includes/admin_navbar.php'; ?>
-    <div class="container mt-4">
+<?php include __DIR__ . '/../includes/admin_sidebar.php'; ?>
+<div class="content-wrapper">
+    <?php include __DIR__ . '/../includes/admin_content_header.php'; ?>
+    <div class="container-fluid">
         <div class="card shadow-sm mb-4">
             <div class="card-header bg-dark text-white">
                 <i class="fas fa-home me-2"></i> Dashboard Administrator
@@ -263,82 +151,4 @@ try {
             </div>
         </div>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-function loadNotifications() {
-    // Menggunakan Fetch API untuk mengambil notifikasi dari get_notifications.php
-    fetch('get_notifications.php')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
-            }
-            return response.json();
-        })
-        .then(data => {
-            const notificationArea = document.getElementById('notification-area');
-            if (notificationArea && data.notifications) {
-                if (data.notifications.length > 0) {
-                    let htmlContent = `<div class="alert alert-info alert-dismissible fade show alert-custom shadow-sm" role="alert">
-                                        <h5 class="alert-heading"><i class="fas fa-bell me-2"></i> Notifikasi Baru!</h5>
-                                        <ul class="list-unstyled mb-2">`;
-                    data.notifications.forEach(notif => {
-                        let icon = '';
-                        switch(notif.type) {
-                            case 'success': icon = '<i class="fas fa-check-circle text-success me-2"></i>'; break;
-                            case 'danger': icon = '<i class="fas fa-times-circle text-danger me-2"></i>'; break;
-                            case 'warning': icon = '<i class="fas fa-exclamation-triangle text-warning me-2"></i>'; break;
-                            default: icon = '<i class="fas fa-info-circle text-info me-2"></i>'; break;
-                        }
-                        htmlContent += `<li>${icon} ${notif.message} <span class="text-muted small ms-2">(${notif.created_at_formatted})</span></li>`;
-                    });
-                    htmlContent += `</ul>
-                                    <hr class="my-4">
-                                    <a href="mark_notifications_read.php" class="btn btn-sm btn-outline-info">Tandai Semua Sudah Dibaca</a>
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                </div>`;
-                    notificationArea.innerHTML = htmlContent;
-                } else {
-                    // Jika tidak ada notifikasi baru, kosongkan area notifikasi
-                    notificationArea.innerHTML = '';
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error loading notifications:', error);
-            const notificationArea = document.getElementById('notification-area');
-            if(notificationArea) {
-                notificationArea.innerHTML = `<div class="alert alert-danger">Gagal memuat notifikasi. Silakan refresh halaman.</div>`;
-            }
-        });
-}
-
-// Muat notifikasi saat halaman pertama kali dimuat
-document.addEventListener('DOMContentLoaded', loadNotifications);
-
-// Muat ulang notifikasi setiap 30 detik (Anda bisa sesuaikan intervalnya)
-// Jangan terlalu sering agar tidak membebani server
-setInterval(loadNotifications, 30000); // 30000 ms = 30 detik
-</script>
-<!-- Logout Confirmation Modal -->
-<div class="modal fade" id="logoutConfirmModal" tabindex="-1" aria-labelledby="logoutConfirmModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="logoutConfirmModalLabel">Konfirmasi Logout</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        Apakah Anda yakin ingin keluar dari sesi Anda?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-        <a href="/mtq/logout.php" class="btn btn-danger">Logout</a>
-      </div>
-    </div>
-  </div>
-</div>
-<?php include __DIR__.'/../includes/footer.php'; ?>
-</body>
-</html>
+<?php include __DIR__.'/../includes/admin_footer.php'; ?>

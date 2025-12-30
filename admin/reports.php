@@ -1,12 +1,6 @@
 <?php
-session_start();
-require_once __DIR__.'/../includes/auth.php';
-if ($_SESSION['role'] !== 'admin') {
-    header('Location: ../login.php');
-    exit();
-}
-
-require_once __DIR__.'/../config/database.php';
+$page_title = 'Laporan Pendaftaran dan Scoring';
+require_once __DIR__.'/../includes/admin_header.php';
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -143,47 +137,11 @@ $scores = $scoring_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Ambil daftar lomba untuk filter
 $competitions = $pdo->query("SELECT id, name FROM competitions ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
-
-$full_name = htmlspecialchars($_SESSION['full_name'] ?? $_SESSION['username'] ?? 'Admin'); // Ensure $full_name is defined for admin_navbar.php
 ?>
-
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Pendaftaran dan Scoring</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
-        .status-badge {
-            font-size: 0.8rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 1rem;
-        }
-        .status-open { background-color: #28a745; color: white; }
-        .status-closed { background-color: #dc3545; color: white; }
-        .status-completed { background-color: #17a2b8; color: white; }
-        .filter-container {
-            background-color: #f8f9fa;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-        .pagination {
-            justify-content: center;
-            margin-top: 1rem;
-        }
-    </style>
-</head>
-<body>
-    <?php include __DIR__.'/../includes/admin_navbar.php'; ?>
-    
-    <div class="container py-4">
+<?php include __DIR__ . '/../includes/admin_sidebar.php'; ?>
+<div class="content-wrapper">
+    <?php include __DIR__ . '/../includes/admin_content_header.php'; ?>
+    <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2><i class="bi bi-bar-chart-line"></i> Laporan Pendaftaran dan Scoring</h2>
             <a href="dashboard_admin.php" class="btn btn-secondary">
@@ -379,11 +337,7 @@ $full_name = htmlspecialchars($_SESSION['full_name'] ?? $_SESSION['username'] ??
                 <?php endif; ?>
             </div>
         </div>
-	<form method="POST" action="generate_championship_results.php" class="mb-4">
-    <button type="submit" name="generate_results" class="btn btn-primary">
-        <i class="bi bi-trophy"></i> Generate Hasil Kejuaraan
-    </button>
-	</form>
+
         <div class="card">
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
@@ -506,31 +460,4 @@ $full_name = htmlspecialchars($_SESSION['full_name'] ?? $_SESSION['username'] ??
             </div>
         </div>
     </div>
-
-    </div> <!-- Close container -->
-    <footer class="mt-5 py-3 bg-light">
-        <div class="container">
-          <p class="text-center mb-0">Developed by <b>Panut, S.Pd.</b> | SD Negeri Jomblang 2 &copy; 2025</p>
-        </div>
-    </footer>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Logout Confirmation Modal -->
-    <div class="modal fade" id="logoutConfirmModal" tabindex="-1" aria-labelledby="logoutConfirmModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="logoutConfirmModalLabel">Konfirmasi Logout</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            Apakah Anda yakin ingin keluar dari sesi Anda?
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-            <a href="/mtq/logout.php" class="btn btn-danger">Logout</a>
-          </div>
-        </div>
-      </div>
-    </div>
-</body>
-</html>
+<?php include __DIR__.'/../includes/admin_footer.php'; ?>
