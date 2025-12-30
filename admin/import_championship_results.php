@@ -130,9 +130,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excelFile'])) {
             $score_raw = $rowData[3];
             $school_raw = $rowData[4];
 
-            $competition_name = trim($competition_name_raw);
-            $participant_name = trim($participant_name_raw);
-            $school = trim($school_raw);
+            $competition_name = htmlspecialchars(trim($competition_name_raw), ENT_QUOTES, 'UTF-8');
+            $participant_name = htmlspecialchars(trim($participant_name_raw), ENT_QUOTES, 'UTF-8');
+            $school = htmlspecialchars(trim($school_raw), ENT_QUOTES, 'UTF-8');
 
             // Convert position from Excel (can be text or number) to integer ID
             $position = 6; // Default to 'Lainnya' (ID 6) if not recognized

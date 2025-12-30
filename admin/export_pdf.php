@@ -1,4 +1,8 @@
 <?php
+session_start();
+require_once __DIR__.'/../includes/auth.php';
+requireRole('admin');
+
 require_once __DIR__.'/../config/database.php';
 require_once __DIR__.'/../libs/dompdf/autoload.inc.php';
 

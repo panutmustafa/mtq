@@ -5,18 +5,23 @@ require_once __DIR__.'/../includes/admin_header.php';
 // Proses tambah lomba
 $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_competition'])) {
-    $name = trim($_POST['name']);
-    $description = trim($_POST['description']);
+    $name = htmlspecialchars(trim($_POST['name'] ?? ''), ENT_QUOTES, 'UTF-8');
+    $description = htmlspecialchars(trim($_POST['description'] ?? ''), ENT_QUOTES, 'UTF-8');
     $start_date = $_POST['start_date'];
     $end_date = $_POST['end_date'];
-    $status = $_POST['status'];
+    $status = trim($_POST['status'] ?? '');
 
-    try {
-        $stmt = $pdo->prepare("INSERT INTO competitions (name, description, start_date, end_date, status) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$name, $description, $start_date, $end_date, $status]);
-        $message = '<div class="alert alert-success">Lomba berhasil ditambahkan!</div>';
-    } catch (PDOException $e) {
-        $message = '<div class="alert alert-danger">Error: ' . htmlspecialchars($e->getMessage()) . '</div>';
+    $allowed_statuses = ['open', 'closed'];
+    if (!in_array($status, $allowed_statuses)) {
+        $message = '<div class="alert alert-danger">Error: Status yang dipilih tidak valid.</div>';
+    } else {
+        try {
+            $stmt = $pdo->prepare("INSERT INTO competitions (name, description, start_date, end_date, status) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$name, $description, $start_date, $end_date, $status]);
+            $message = '<div class="alert alert-success">Lomba berhasil ditambahkan!</div>';
+        } catch (PDOException $e) {
+            $message = '<div class="alert alert-danger">Error: ' . htmlspecialchars($e->getMessage()) . '</div>';
+        }
     }
 }
 
@@ -46,18 +51,23 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
 // Proses update lomba
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_competition'])) {
     $competition_id = (int)$_POST['competition_id'];
-    $name = trim($_POST['name']);
-    $description = trim($_POST['description']);
+    $name = htmlspecialchars(trim($_POST['name'] ?? ''), ENT_QUOTES, 'UTF-8');
+    $description = htmlspecialchars(trim($_POST['description'] ?? ''), ENT_QUOTES, 'UTF-8');
     $start_date = $_POST['start_date'];
     $end_date = $_POST['end_date'];
-    $status = $_POST['status'];
+    $status = trim($_POST['status'] ?? '');
 
-    try {
-        $stmt = $pdo->prepare("UPDATE competitions SET name = ?, description = ?, start_date = ?, end_date = ?, status = ? WHERE id = ?");
-        $stmt->execute([$name, $description, $start_date, $end_date, $status, $competition_id]);
-        $message = '<div class="alert alert-success">Lomba berhasil diperbarui!</div>';
-    } catch (PDOException $e) {
-        $message = '<div class="alert alert-danger">Error: ' . htmlspecialchars($e->getMessage()) . '</div>';
+    $allowed_statuses = ['open', 'closed'];
+    if (!in_array($status, $allowed_statuses)) {
+        $message = '<div class="alert alert-danger">Error: Status yang dipilih tidak valid.</div>';
+    } else {
+        try {
+            $stmt = $pdo->prepare("UPDATE competitions SET name = ?, description = ?, start_date = ?, end_date = ?, status = ? WHERE id = ?");
+            $stmt->execute([$name, $description, $start_date, $end_date, $status, $competition_id]);
+            $message = '<div class="alert alert-success">Lomba berhasil diperbarui!</div>';
+        } catch (PDOException $e) {
+            $message = '<div class="alert alert-danger">Error: ' . htmlspecialchars($e->getMessage()) . '</div>';
+        }
     }
 }
 

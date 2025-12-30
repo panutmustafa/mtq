@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors['full_name'] = 'Full name is required';
     }
 
-    if (empty($role) || !in_array($role, ['admin', 'jury', 'user'])) {
+    if (empty($role) || !in_array($role, ['jury', 'user'])) {
         $errors['role'] = 'Invalid role selected';
     }
 
@@ -185,10 +185,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             id="role" name="role" required>
                         <option value="">Select your role</option>
                         <option value="user" <?= $role === 'user' ? 'selected' : '' ?>>Participant</option>
-                        <option value="jury" <?= $role === 'jury' ? 'selected' : '' ?>>Jury Member</option>
-                        <option value="admin" <?= $role === 'admin' ? 'selected' : '' ?>>Administrator</option>
-                    </select>
-                    <?php if (isset($errors['role'])): ?>
+                                                    <option value="jury" <?= $role === 'jury' ? 'selected' : '' ?>>Jury Member</option>
+                                                </select>                    <?php if (isset($errors['role'])): ?>
                         <div class="error-message"><?= $errors['role'] ?></div>
                     <?php endif; ?>
                     <small class="text-muted">Note: Admin accounts require additional verification</small>

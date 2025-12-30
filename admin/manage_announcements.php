@@ -4,8 +4,8 @@ require_once __DIR__ . '/../includes/admin_header.php';
 
 // Proses tambah pengumuman
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_announcement'])) {
-    $title = trim($_POST['title']);
-    $content = trim($_POST['content']);
+    $title = htmlspecialchars(trim($_POST['title'] ?? ''), ENT_QUOTES, 'UTF-8');
+    $content = htmlspecialchars(trim($_POST['content'] ?? ''), ENT_QUOTES, 'UTF-8');
     $created_by = $_SESSION['user_id'];
 
     try {
@@ -13,22 +13,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_announcement'])) 
         $stmt->execute([$title, $content, $created_by]);
         $message = '<div class="alert alert-success">Pengumuman berhasil ditambahkan!</div>';
     } catch (PDOException $e) {
-        $message = '<div class="alert alert-danger">Error: ' . htmlspecialchars($e->getMessage()) . '</div>';
+        $message = '<div class="alert alert-danger">Error: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . '</div>';
     }
 }
 
 // Proses edit pengumuman
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_announcement'])) {
     $id = (int)$_POST['id'];
-    $title = trim($_POST['title']);
-    $content = trim($_POST['content']);
+    $title = htmlspecialchars(trim($_POST['title'] ?? ''), ENT_QUOTES, 'UTF-8');
+    $content = htmlspecialchars(trim($_POST['content'] ?? ''), ENT_QUOTES, 'UTF-8');
 
     try {
         $stmt = $pdo->prepare("UPDATE announcements SET title = ?, content = ? WHERE id = ?");
         $stmt->execute([$title, $content, $id]);
         $message = '<div class="alert alert-success">Pengumuman berhasil diperbarui!</div>';
     } catch (PDOException $e) {
-        $message = '<div class="alert alert-danger">Error: ' . htmlspecialchars($e->getMessage()) . '</div>';
+        $message = '<div class="alert alert-danger">Error: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . '</div>';
     }
 }
 
@@ -40,7 +40,7 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
         $stmt->execute([$id]);
         $message = '<div class="alert alert-success">Pengumuman berhasil dihapus!</div>';
     } catch (PDOException $e) {
-        $message = '<div class="alert alert-danger">Error: ' . htmlspecialchars($e->getMessage()) . '</div>';
+        $message = '<div class="alert alert-danger">Error: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . '</div>';
     }
 }
 

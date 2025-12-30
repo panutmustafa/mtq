@@ -74,12 +74,12 @@ $assignments = $stmt_assignments->fetchAll();
 
         <!-- Notifikasi -->
         <?php if (isset($_SESSION['error'])): ?>
-            <div class="alert alert-danger"><?= $_SESSION['error'] ?></div>
+            <div class="alert alert-danger"><?= htmlspecialchars($_SESSION['error'], ENT_QUOTES, 'UTF-8') ?></div>
             <?php unset($_SESSION['error']); ?>
         <?php endif; ?>
         
         <?php if (isset($_SESSION['success'])): ?>
-            <div class="alert alert-success"><?= $_SESSION['success'] ?></div>
+            <div class="alert alert-success"><?= htmlspecialchars($_SESSION['success'], ENT_QUOTES, 'UTF-8') ?></div>
             <?php unset($_SESSION['success']); ?>
         <?php endif; ?>
 

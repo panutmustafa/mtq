@@ -27,10 +27,10 @@ if (isset($_GET['id'])) {
 
 // Proses update hasil kejuaraan
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_championship_result'])) {
-    $participant_name = trim($_POST['participant_name']);
+    $participant_name = htmlspecialchars(trim($_POST['participant_name'] ?? ''), ENT_QUOTES, 'UTF-8');
     $position = (int)$_POST['position'];
-    $score = (float)$_POST['score'];
-    $school = trim($_POST['school']);
+    $score = $_POST['score'] !== '' ? (float)$_POST['score'] : null;
+    $school = htmlspecialchars(trim($_POST['school'] ?? ''), ENT_QUOTES, 'UTF-8');
     
     try {
         $stmt = $pdo->prepare("UPDATE championships 
@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_championship_r
         exit();
     } catch (PDOException $e) {
         // Debugging: Tampilkan pesan kesalahan
-        echo "<div style='color: red;'>" . htmlspecialchars($e->getMessage()) . "</div>";
+        echo "<div style='color: red;'>" . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . "</div>";
         exit(); // Hentikan eksekusi setelah menampilkan kesalahan
     }
 }

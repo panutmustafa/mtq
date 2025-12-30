@@ -19,11 +19,11 @@ $feedback_type = ''; // success, danger, warning, info
 
     // Proses input hasil kejuaraan manual
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_championship_result'])) {
-        $competition_name = trim($_POST['competition_name'] ?? '');
-        $participant_name = trim($_POST['participant_name'] ?? '');
+        $competition_name = htmlspecialchars(trim($_POST['competition_name'] ?? ''), ENT_QUOTES, 'UTF-8');
+        $participant_name = htmlspecialchars(trim($_POST['participant_name'] ?? ''), ENT_QUOTES, 'UTF-8');
         $position_input_id = (int)($_POST['position'] ?? 0); // Ambil ID integer dari form
         $score = $_POST['score'] !== '' ? (float)$_POST['score'] : null; // Ubah menjadi null jika kosong
-        $school = trim($_POST['school'] ?? '');
+        $school = htmlspecialchars(trim($_POST['school'] ?? ''), ENT_QUOTES, 'UTF-8');
 
         // Validasi sederhana: Pastikan posisi adalah integer valid antara 1 dan 6
         if (empty($competition_name) || empty($participant_name) || empty($school) || !array_key_exists($position_input_id, $positionDisplayMap)) {

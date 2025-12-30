@@ -7,33 +7,43 @@ $message = '';
 
 // 1. PROSES TAMBAH USER
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
-    $username = trim($_POST['username']);
+    $username = htmlspecialchars(trim($_POST['username'] ?? ''), ENT_QUOTES, 'UTF-8');
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $full_name = trim($_POST['full_name']);
-    $role = trim($_POST['role']); // Pastikan menggunakan trim()
+    $full_name = htmlspecialchars(trim($_POST['full_name'] ?? ''), ENT_QUOTES, 'UTF-8');
+    $role = htmlspecialchars(trim($_POST['role'] ?? ''), ENT_QUOTES, 'UTF-8');
 
-    try {
-        $stmt = $pdo->prepare("INSERT INTO users (username, password, full_name, role) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$username, $password, $full_name, $role]);
-        $message = '<div class="alert alert-success">User  berhasil ditambahkan!</div>';
-    } catch (PDOException $e) {
-        $message = '<div class="alert alert-danger">Error: ' . htmlspecialchars($e->getMessage()) . '</div>';
+    $allowed_roles = ['admin', 'jury', 'user'];
+    if (!in_array($role, $allowed_roles)) {
+        $message = '<div class="alert alert-danger">Error: Peran yang dipilih tidak valid.</div>';
+    } else {
+        try {
+            $stmt = $pdo->prepare("INSERT INTO users (username, password, full_name, role) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$username, $password, $full_name, $role]);
+            $message = '<div class="alert alert-success">User berhasil ditambahkan!</div>';
+        } catch (PDOException $e) {
+            $message = '<div class="alert alert-danger">Error: ' . htmlspecialchars($e->getMessage()) . '</div>';
+        }
     }
 }
 
 // 3. PROSES UPDATE USER
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
     $user_id = (int)$_POST['user_id'];
-    $username = trim($_POST['username']);
-    $full_name = trim($_POST['full_name']);
-    $role = trim($_POST['role']); // Pastikan menggunakan trim()
+    $username = htmlspecialchars(trim($_POST['username'] ?? ''), ENT_QUOTES, 'UTF-8');
+    $full_name = htmlspecialchars(trim($_POST['full_name'] ?? ''), ENT_QUOTES, 'UTF-8');
+    $role = htmlspecialchars(trim($_POST['role'] ?? ''), ENT_QUOTES, 'UTF-8');
 
-    try {
-        $stmt = $pdo->prepare("UPDATE users SET username = ?, full_name = ?, role = ? WHERE id = ?");
-        $stmt->execute([$username, $full_name, $role, $user_id]);
-        $message = '<div class="alert alert-success">User  berhasil diperbarui!</div>';
-    } catch (PDOException $e) {
-        $message = '<div class="alert alert-danger">Error: ' . htmlspecialchars($e->getMessage()) . '</div>';
+    $allowed_roles = ['admin', 'jury', 'user'];
+    if (!in_array($role, $allowed_roles)) {
+        $message = '<div class="alert alert-danger">Error: Peran yang dipilih tidak valid.</div>';
+    } else {
+        try {
+            $stmt = $pdo->prepare("UPDATE users SET username = ?, full_name = ?, role = ? WHERE id = ?");
+            $stmt->execute([$username, $full_name, $role, $user_id]);
+            $message = '<div class="alert alert-success">User berhasil diperbarui!</div>';
+        } catch (PDOException $e) {
+            $message = '<div class="alert alert-danger">Error: ' . htmlspecialchars($e->getMessage()) . '</div>';
+        }
     }
 }
 

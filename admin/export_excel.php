@@ -1,4 +1,8 @@
 <?php
+session_start();
+require_once __DIR__.'/../includes/auth.php';
+requireRole('admin');
+
 // Set high limits for large exports
 ini_set('memory_limit', '512M'); // Increase memory limit
 ini_set('max_execution_time', '300'); // Increase max execution time (5 minutes)
